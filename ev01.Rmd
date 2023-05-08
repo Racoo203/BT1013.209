@@ -1,0 +1,144 @@
+---
+title: "Evidencia 1"
+author: "Raúl Correa Ocañas A01722401"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Parte 1
+
+Investiga, ¿Cuál es la situación actual de COVID-19 a nivel mundial, en México? Puedes iniciar tu búsqueda en el sitio de Johns Hopkins.
+
+
+La universidad de Johns Hopkins ha estudiado la evolución de la problemática de la pandemia. Se tiene información de ésta hasta el 10 de marzo de 2023. Se han registrado más de 676.6 millones de casos de COVID-19 en todo el mundo, y 6.8 millones de personas han fallecido de este virus. En los últimos 28 días, se estiman alrededor de 4 millones de casos de COVID-19 detectados, y 28,000 personas muertas. Más de 13.3 mil millones de vacunas han sido administradas, donde 28.1 millones de vacunas fueron administradas en el último mes (COVID-19 Map - Johns Hopkins Coronavirus Resource Center, 2023). Según la Organización Mundial de la Salud, el 98% de los linajes de variantes actuales del COVID-19 provienen de la variante Omicron (WHO, 2023). En cuanto a la situación en México, más de 7.4 millones de personas han sido contagiadas del virus, y en los últimos 28 días se registraron 82,596 casos.333,000 defunciones a causa de COVID-19 han sido ingresadas desde el principio de la pandemia. En el último mes, 608 muertes fueron registradas.
+
+
+¿Cuál fue la primera variante del virus que se propagó a todo el mundo?
+
+
+	Según la AMS (American Society for Microbiology), la variante Alfa B.1.1.7 fue la primera variante de COVID que se propagó en todo el mundo y que hizo auge en los medios. (B.1.1.7: What We Know about the Novel SARS-CoV-2 Variant | ASM.org, 2021)
+
+
+¿Cuáles son las otras variantes del virus que existen en otras regiones del mundo?
+
+
+Alfa, Beta, Gamma, Delta, Omicron
+
+
+¿Cómo buscarías información de la variante del virus en tu país?
+	
+	Cuando se trata de este tipo de problemáticas, es de mejor conveniencia respaldarse de los profesionales especializados en el estudio del virus. Por lo tanto, yo utilizaría fuentes como la OMS, la CDC, la Secretaría de Salud, y los medios de comunicación locales. Es importante tener algo de conocimiento básico de literatura médica, para tener una mejor evaluación de los actuales procesos, medidas y precauciones que se llevan a cabo para prevenir otra contingencia. Ante la duda, no hace daño tomar precauciones y preguntar a los médicos sobre cualquier duda.
+	
+	
+	Imagina que te encuentras en una situación similar a la de Li Wenliang, médico chino que intentó alertar sobre el brote de coronavirus en su país, pero fue detenido por las autoridades y obligado a retractarse, ¿qué harías en su caso? Selecciona un inciso: 
+
+a) Lo reportas al centro de investigación o la universidad. 
+
+b) Lo reportas a la prensa.
+
+c) Guardas la información. 
+
+Pienso que entre las tres opciones, la mejor sería reportarlo al centro de investigación o la universidad. Difundir este tipo de información a la prensa es importante, pero debe ser apropiadamente redactada y debe buscar correctamente cómo representar la verdad. El ir a la prensa y platicar sobre esta información puede ocasionar una crisis y confusión que puede terminar perjudicando nuestro juicio en cuanto nuestras decisiones respecto a un nuevo virus. Claro, guardar la información sería lo equivalente a que nadie sepa que esto está ocurriendo, por lo que también puede ser peligroso al tener una falta de acción para prevenir su desarrollo. Presentar esta información a un centro de investigación puede estar limitado por el gobierno, pero es preferible proporcionar esta información a profesionistas que pueden evaluar a mayor detalle la situación.
+
+## Parte 2
+
+1. Obtén las secuencias de las variantes de SARS-CoV-2 desde el NCBILinks to an external site. o el buscador de virus del NCBILinks to an external site..
+
+Accession ID: MZ290418.1
+Nombre de la variante: B.1.214.2
+
+Accession ID: MZ293102.1
+Nombre de la variante: B.1.214.3
+
+Accession ID: MZ291208.1
+Nombre de la variante: B.1.214.4
+
+Accession ID: MZ304006.1
+Nombre de la variante: B.1.1.318
+
+Accession ID: MZ297900.1
+Nombre de la variante: B.1.621
+
+2. Calcula la longitud de las secuencias de cada variante.
+
+
+```{r}
+library(seqinr)
+library(adegenet)
+library(ape)
+library(DECIPHER)
+library(viridis)
+library(ggplot2)
+library(rentrez)
+
+email <- "a01722401@tec.mx"
+acc_numbers <- c("MZ290418.1","MZ293102.1","MZ291208.1","MZ304006.1","MZ297900.1")
+sequences <- entrez_fetch(db = "nucleotide", id = acc_numbers, rettype = "fasta", retmode = "text", email = email)
+writeLines(sequences, "SARS-CoV-2.fasta")
+aa_seqs <- readAAStringSet("SARS-CoV-2.fasta",format = "fasta")
+aa_seqs
+```
+
+
+3. Crea una gráfica donde compares las bases de ADN que componen a cada una de las variantes del virus.
+
+```{r}
+covid <- read.fasta(file = "SARS-CoV-2.fasta")
+covideq1 <- covid[[1]]
+covideq2 <- covid[[2]]
+covideq3 <- covid[[3]]
+covideq4 <- covid[[4]]
+covideq5 <- covid[[5]]
+
+cuentas<-table(covideq1)
+barplot(table(covideq1), main='Covid MZ290418.1', xlab='bases', ylab='frecuencia',col = c('blue','cyan','lightgreen','red', 'purple'))
+
+cuentas<-table(covideq2)
+barplot(table(covideq2), main='Covid MZ293102.1', xlab='bases', ylab='frecuencia',col = c('blue','cyan','lightgreen','red','purple'))
+
+cuentas<-table(covideq3)
+barplot(table(covideq3), main='Covid MZ291208.1', xlab='bases', ylab='frecuencia',col = c('blue','cyan','lightgreen','red','purple'))
+
+cuentas<-table(covideq4)
+barplot(table(covideq4), main='Covid MZ304006.1', xlab='bases', ylab='frecuencia',col = c('blue','cyan','lightgreen','red','purple'))
+
+cuentas<-table(covideq5)
+barplot(table(covideq5), main='Covid MZ297900.1', xlab='bases', ylab='frecuencia',col = c('blue','cyan','lightgreen','red','purple'))
+```
+
+
+4. ¿Cuál es el %GC de cada variante? 
+```{r}
+library(seqinr)
+
+covid <- read.fasta(file = "SARS-CoV-2.fasta")
+
+gc_percents <- sapply(covid, function(x) GC(x)/length(x)*100)
+
+gc_percents
+```
+5. Crea las secuencias contrasentido de cada variante. 
+
+```{r}
+
+library(Biostrings)
+
+covid <- read.fasta(file = "SARS-CoV-2.fasta")
+
+reverse_seqs <- sapply(covid, function(x) {
+  reverseComplement(DNAStringSet(x))
+})
+
+names(reverse_seqs) <- names(covid)
+
+reverse_seqs
+```
+6. Agrega una interpretación individual escrita de las gráficas que integras.
+
+Las graficas que se muestran anteriormente son mas dominantes en timina y adenina y tienen un porceinto de guanina y citosina mas bajo. esto es gracias a que la canitdad de bases en un virus representa su capacidad de evadir el sistema imunologico , tamano, comlejida y otras cosas. 
+
+Que el porcentaje de una variante sea bajo en GC es decir que tienen una menor estabilidad en la estructura y que puede afectar en los genes. 

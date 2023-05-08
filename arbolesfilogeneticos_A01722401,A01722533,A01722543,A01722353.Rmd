@@ -1,0 +1,157 @@
+---
+title: "Actividad_Sesión7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+# Actividad 5: Análisis de secuencias en R
+
+Parte 1 1. Busca en NCBI las secuencias de los genomas de: - Zika virus - Dengue virus - SARS-COV2 virus - SARS-COV1 virus
+
+Zika virus:       NC_012532.1
+Dengue virus:     NC_001474.2
+SARS-COV2:        NC_045512.2
+SARS-COV1:        NC_019843.3
+
+3.  Carga las secuencias
+
+```{r}
+library(seqinr)
+library(adegenet)
+library(ape)
+library(ggtree)
+library(DECIPHER)
+library(viridis)
+library(ggmsa)
+library(ggplot2)
+library(rentrez)
+
+email <- "a01722401@tec.mx"
+acc_numbers <- c("B.1.1.7","B.1.351","P.1","B.1.617.2","B.1.1.529")
+sequences <- entrez_fetch(db = "protein", id = acc_numbers, rettype = "fasta", retmode = "text", email = email)
+writeLines(sequences, "hemagglutinin.fasta")
+aa_seqs <- readAAStringSet("hemagglutinin.fasta",format = "fasta")
+aa_seqs
+```
+
+4.  Realiza una gráfica por cada genóma que comparen el contenido de cada base nuecleotidica. Posteriormente junta todas las gráficas en una sola imagen.
+```{r}
+zika_seq <- read.fasta("zika_fasta.fasta")
+dengue_seq <- read.fasta("dengue_fasta.fasta")
+sarscov2_seq <- read.fasta("sarscov2_fasta.fasta")
+sarscov1_seq <- read.fasta("sarscov1_fasta.fasta")
+
+count_bases <- function(seq) {
+  A <- sum(seq == "A")
+  C <- sum(seq == "C")
+  G <- sum(seq == "G")
+  T <- sum(seq == "T" | seq == "U")  # U es una base válida en algunos virus
+  return(c(A, C, G, T))
+}
+
+zika_counts <- count_bases(zika_seq[[1]])
+dengue_counts <- count_bases(dengue_seq[[1]])
+sarscov2_counts <- count_bases(sarscov2_seq[[1]])
+sarscov1_counts <- count_bases(sarscov1_seq[[1]])
+
+barplot(zika_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en Zika virus")
+barplot(dengue_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en Dengue virus")
+barplot(sarscov2_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en SARS-CoV-2 virus")
+barplot(sarscov1_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en SARS-CoV-1 virus")
+
+par(mfrow = c(2, 2))
+barplot(zika_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en Zika virus")
+barplot(dengue_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en Dengue virus")
+barplot(sarscov2_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en SARS-CoV-2 virus")
+barplot(sarscov1_counts, names.arg = c("A", "C", "G", "T"), 
+        main = "Contenido de base nucleotídica en SARS-CoV-1 virus")
+
+```
+
+5.  Concluye las diferencias entre cada secuencia.
+
+
+En el caso de los virus Dengue y Zika pertenecen al género Flavivirus y comparten muchas similitudes en su estructura genómica y su patogenia.Sin embargo, existen algunas diferencias en las proteínas que codifican, como la proteína NS1. Por otro lado, en el caso de los virus SARS-Cov2 y SARS-Cov1, pertenecen al género Betacoronavirus.
+
+
+Parte 2:
+
+1.  Busca en NCBI las secuencias aminoacidicas (proteinas) de la "neuroamidase" de los virus:
+
+-   H1N1
+-   H7N9
+-   H2N2
+-   H3N2
+
+```{r}
+library(seqinr)
+library(adegenet)
+library(ape)
+library(ggtree)
+library(DECIPHER)
+library(viridis)
+library(ggmsa)
+library(ggplot2)
+library(rentrez)
+
+email <- "A01722401@tec.mx"
+acc_numbers <- c("YP_009118626.1","YP_009118475.1","YP_308850.1","YP_308839.1")
+sequences <- entrez_fetch(db = "protein", id = acc_numbers, rettype = "fasta", retmode = "text", email = email)
+writeLines(sequences, "hemagglutinin.fasta")
+aa_seqs <- readAAStringSet("hemagglutinin.fasta",format = "fasta")
+aa_seqs
+
+length(aa_seqs)
+hem_H1N1 <- aa_seqs[[1]] 
+hem_H7N9 <- aa_seqs[[2]] 
+hem_H2N2 <- aa_seqs[[3]] 
+hem_H3N2 <- aa_seqs[[4]] 
+
+length(hem_H1N1)
+
+```
+
+
+2.  Crea un alineamiento y visualizalo.
+
+```{r}
+hem_seqs_align <- AlignSeqs(aa_seqs)
+BrowseSeqs(hem_seqs_align, highlight=0)
+writeXStringSet(hem_seqs_align, file="hem_seqs_align.fasta")
+hem_aligned <- read.alignment("hem_seqs_align.fasta", format = "fasta")
+```
+
+
+3.  Crea un arbol filogenético.
+
+```{r}
+matriz_distancia <- dist.alignment(hem_aligned, matrix = "similarity")
+
+temp <- as.data.frame(as.matrix(matriz_distancia))
+table.paint(temp, cleg=0, clabel.row=.5, clabel.col=.5) + scale_color_viridis()
+
+hem_tree <- nj(matriz_distancia)
+class(hem_tree) 
+
+hem_tree <- ladderize(hem_tree)
+
+plot(hem_tree, cex = 0.6)
+title("Hemagglutinin protein from Influenza virus")
+
+```
+
+
+4.  Concluye las diferencias entre cada secuencia.
+
+
+Las anteriores gráficas visualizan la identidad de los amino ácidos. En cuanto al alineamiento, las regiónes altamente conservadas representan la presencia de amino ácidos similares, mientras que las regiones variables quieren decir que los amino ácidos son diferentes. En el árbol filogenético, encontramos las distancias evolutivas. Aquellas que están más cercanas al árbol son las que tienen mayor similitud.

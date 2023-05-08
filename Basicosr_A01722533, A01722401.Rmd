@@ -1,0 +1,187 @@
+---
+title: "Tarea 1_Ejercicios Básicos de R"
+author: "Jorge Palacios A01722533, Raul Correa A01722401"
+date: "2023-03-28"
+output: html_document
+---
+
+### Ejercicio 1
+
+Crear un vector x con los datos 10, 11, 13, −1, 6,3
+
+
+```{r}
+x <- c(10, 11, 13, -1, 6,3)
+```
+
+### Ejercicio 2
+
+Usando el vector x.
+
+1.  Calcula la media
+
+2.  Calcula la desviación éstandar
+
+3.  Calcula la varianza
+
+4.  Crea un vector con el nombre *est.x* en el que estén guardados los anteriores estadísticos.
+
+```{r}
+est.x <- c(mean(x),sd(x),var(x))
+est.x
+
+```
+
+
+### Ejercicio 3
+
+1.  Escribe un programa R para crear una secuencia de números del 20 al 50
+
+2.  Encuentra la media de los números del 20 al 60
+
+3.  Encuentra la sumatoria de todos los números del 51 al 91.
+
+```{r}
+c(20:50)
+mean(c(20:60))
+sum(c(51:91))
+
+```
+
+
+### Ejercicio 4
+
+Escribe un programa R para crear un vector que contenga 10 valores enteros aleatorios entre -100 y +50. Revisa la función `sample( )`.
+
+```{r}
+c(sample((-100:50), size = 10))
+```
+
+
+### Ejercicio 5
+
+Escribe un programa R para obtener los primeros 10 números de Fibonacci (1,1,2,3,5,8,13,21,34 y 55).
+
+```{r}
+
+vec1 <- c(1,1,0,0,0,0,0,0,0,0)
+
+
+for(i in 1:8) {
+  vec1[i+2] <- vec1[i+1] + vec1[i]
+}
+
+print(vec1)
+
+  
+```
+
+
+### Ejercicio 6
+
+Escribe un programa R para encontrar el valor máximo y mínimo de un vector dado. Debes probar\
+con:
+
+```{r}
+serie1<-c(-11,32,52,84,2,6,83)
+serie2<-c(-24,-42, 23,1,4,95,24)
+
+max(serie1)
+min(serie1)
+
+max(serie2)
+min(serie2)
+```
+
+
+### Ejercicio 7
+
+Escribe una función R para multiplicar dos vectores de tipo entero y longitud n, de la misma\
+longitud ambos.
+
+```{r}
+vec1 <- c(1L, 2L, 3L)
+vec2 <- c(3L, 2L, 1L)
+
+multVectors <- function(vec1, vec2){
+  if (length(vec1) == length(vec2) && is.integer(vec1) && is.integer(vec2)){
+    vectMult = vec1 * vec2
+    print(vectMult)
+  }
+}
+
+multVectors(vec1,vec2)
+
+
+```
+
+
+
+### Ejercicio 8
+
+Escribe una función R para contar el valor específico en un vector dado. Ejemplo: en el vector x cuantos 7 hay?
+
+```{r}
+vect <- c(sample(1:10, size = 10, replace = TRUE))
+
+findSevens <- function(vect){
+  
+  count = 0
+  for(i in 1:length(vect)){
+    if(vect[i] == 7){
+      count = count + 1
+    }
+  }
+  
+  print(vect)
+  cat("Sevens in the vector: ", count)
+}
+
+findSevens(vect)
+
+```
+
+
+### Ejercicio 9
+
+Escribe una función en R para extraer cada enésimo elemento de un vector dado.
+
+Ejemplo en un vector del 1:100, dame como salida una serie de i+n. Por lo tanto, si n=5.
+
+Entonces el output sería: 1,6,11,16,21,26,31,36,41,46,51,56,61,66,71,76,81,86,91,96
+
+```{r}
+vect <- c(1:100);
+n <- 5
+i <- 1
+
+function9 <- function(vect, n, i){
+  
+  while(i < length(vect)){
+    print(vect[i])
+    i <- i + n
+  }
+}
+
+function9(vect,n,i)
+
+```
+
+
+### Ejercicio 10
+
+Crea una función que me permita escoger a cuantos decimales de π quiero redondear.
+
+```{r}
+dec <- 11
+
+decimalRounded <- function(dec){
+  
+  roundedPi <- round(pi, digits = dec)
+  print(roundedPi)
+
+}
+
+decimalRounded(dec)
+
+```

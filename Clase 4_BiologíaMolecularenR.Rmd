@@ -1,0 +1,337 @@
+---
+title: "Clase 4: Biolgía molecular en R"
+author: "Raúl Correa, Jorge Andrés Palacios"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# El dogma central de la biología molecular en R
+
+## Ejercicio 1
+
+Escribe una función que genere una secuencia aleatoria de DNA de tamaño "n".
+
+Investiga más sobre las funciones `readline( )` y `sample( )`
+
+```{r}
+# Funcion que toma como parametro el tamaño para generar una secuencia aleatoria de ADN.
+secRand <- function(size) {
+  
+  # A: Adenina
+  # T: Timina
+  # G: Guanina
+  # C: Citosina
+  # Se toma una muestra de 3 de estas 4 bases nitrogenadas
+  muestra = c('A','T','G','C')
+  
+  # Se inicializa un vector con el codón inicial, donde se guardaran las cadenas de bases.
+  resultado = c('AUG')
+  
+  # Creación de cada segmento de longitud 3 de la secuencia
+  for (i in c(1:size)) {
+    
+    # Se guarda la muestra aleatoria en un string temporal
+    tempString = sample(muestra,3)
+    
+    # Se concatena la muestra dentro del vector.
+    resultado = c(resultado,tempString)
+  }
+  
+  codonFinal = sample(c('UAG','UAA','UGA'),1)
+  resultado = c(resultado,codonFinal)
+  
+  # Vector se reduce a un solo String con la secuencia de letras}
+  resultado = paste(resultado, collapse = "")
+  
+  # Se imprime el String
+  print(resultado)
+  
+}
+
+# Se le pide al usuario indicar el tamaño de la secuencia de ADN en la consola
+length = strtoi(readline(prompt = "Indica el numero de codones (excluyendo el principio y fin): "))
+
+# Se corre la funcion secRand con el parametro indicado por el usuario.
+secRand(length)
+
+```
+
+## Ejercicio 2
+
+Codifica una función que calcula el tamaño de una secuencia de DNA.
+
+```{r}
+DNAsequence <- c("A","T","G","C","G","C","A","G","A","T","A","A")
+sizeDNA <- length(DNAsequence)
+sizeDNA
+```
+
+## Ejercicio 3
+
+Crea una función que recibe una secuencia de DNA e imprime el porcentaje de cada base en la secuencia.
+
+NOTA: Recuerda que R distingue entre mayúsculas y minúsculas. `T` en R sirve para realizar una prueba estadística llamada 'T de student', asi que usa la 't' para referirte a la timina.
+
+```{r}
+
+distribucionDeBases <- function(inputString) {
+  inputString = toupper(inputString)
+  countersGACT = c(0,0,0,0)
+  
+  charList = strsplit(inputString,split = "")
+  size = nchar(inputString)
+  
+  
+  for (i in c(1:size)) {
+    
+    currentChar = charList[[1]][i]
+    
+    if (currentChar == "G") {
+      countersGACT[1] = countersGACT[1] + 1
+    }
+    
+    if (currentChar == "A") {
+      countersGACT[2] = countersGACT[2] + 1
+    }
+    
+    if (currentChar == "C") {
+      countersGACT[3] = countersGACT[3] + 1
+    }
+    
+    if (currentChar == "T") {
+      countersGACT[4] = countersGACT[4] + 1
+    }
+    
+  }
+  
+  cat("Guanina: ", 100*countersGACT[1]/size, "%\n")
+  cat("Adenina: ", 100*countersGACT[2]/size, "%\n")
+  cat("Citosina: ", 100*countersGACT[3]/size, "%\n")
+  cat("Timina: ", 100*countersGACT[4]/size, "%\n")
+
+  
+}
+
+input = readline(prompt = "Ingresa la secuencia de ADN.")
+# input <- secRand(90)
+distribucionDeBases(input)
+
+```
+
+## Ejercicio 4
+
+Programa una función que transcribe DNA a RNA.
+
+```{r}
+DNAsequence <- c("A","T","G","C","G","C","A","G","A","T","A","A")
+RNAsequence <- c("","","","","","","","","","","","")
+
+DNAtoRNA <- function(DNAsequence,RNAsequence){
+  for(i in (1:length(DNAsequence))){
+    if (DNAsequence[i] == "T"){
+      RNAsequence[i] <- "U"
+    }else{
+      RNAsequence[i] <- DNAsequence[i]
+    }
+  }
+  return(RNAsequence)
+}
+
+DNAtoRNA(DNAsequence,RNAsequence)
+```
+
+## Ejercicio 5
+
+Crea una función que traduce una secuencia de RNA a una secuencia de proteínas.
+```{r}
+aminoacidos_df <- data.frame(
+  codones = c(
+    "GGG","GGU","GGA","GGC",
+    "GUG","GUU","GUA","GUC",
+    "GAG","GAU","GAA","GAC",
+    "GCG","GCU","GCA","GCC",
+    
+    "UGG","UGU","UGA","UGC",
+    "UUG","UUU","UUA","UUC",
+    "UAG","UAU","UAA","UAC",
+    "UCG","UCU","UCA","UCC",
+    
+    "AGG","AGU","AGA","AGC",
+    "AUG","AUU","AUA","AUC",
+    "AAG","AAU","AAA","AAC",
+    "ACG","ACU","ACA","ACC",
+    
+    "CGG","CGU","CGA","CGC",
+    "CUG","CUU","CUA","CUC",
+    "CAG","CAU","CAA","CAC",
+    "CCG","CCU","CCA","CCC"
+    ),
+  
+  amino = c(
+    
+    "Glicina","Glicina","Glicina","Glicina",
+    "Valina","Valina","Valina","Valina",
+    "Ácido glutámico","Ácido aspártico","Ácido glutámico","Ácido aspártico",
+    "Alanina","Alanina","Alanina","Alanina",
+    
+    "Tirosina","Cisteína","STOP","Cisteína",
+    "Leucina","Fenilalanina","Leucina","Fenilalanina",
+    "STOP","Tirosina","STOP","Tirosina",
+    "Serina","Serina","Serina","Serina",
+    
+    "Arginina","Serina","Arginina","Serina",
+    "Metionina","Isoleucina","Isoleucina","Isoleucina",
+    "Lisina","Asparagina","Lisina","Asparagina",
+    "Treonina","Treonina","Treonina","Treonina",
+    
+    "Arginina","Arginina","Arginina","Arginina",
+    "Leucina","Leucina","Leucina","Leucina",
+    "Glutamina","Histidina","Glutamina","Histidina",
+    "Prolina","Prolina","Prolina","Prolina"
+
+    )
+  
+)
+```
+
+
+```{r}
+# Expected: Glicina
+
+dictAmino <- function(inputString) {
+  
+  out = NA
+  
+  # Indica la proteina correspondiente a la secuencia de RNA
+  for (i in c(1:length(aminoacidos_df$codones))) {
+    if (inputString == aminoacidos_df$codones[i]) {
+      out = aminoacidos_df$amino[i]
+    }
+  }
+  
+  return(out)
+}
+
+traduccion <- function(inputString) {
+  
+  finalString = ""
+  
+  secCodones = strsplit(inputString, "")[[1]]
+  secCodones = paste0(secCodones[c(TRUE, FALSE, FALSE)], 
+                      secCodones[c(FALSE, TRUE, FALSE)],
+                      secCodones[c(FALSE, FALSE, TRUE)])
+  
+  for (i in c(1:length(secCodones))) {
+    tempString = secCodones[i]
+    aminoacido = paste(dictAmino(tempString),"-")
+    finalString = paste(finalString,aminoacido)
+  }
+  
+  print(finalString)
+}
+
+inputString = readline(prompt = "Ingresa una secuencia de RNA:")
+traduccion(inputString)
+
+```
+
+## Ejercicio 6
+
+Escribe una función que recibe una hebra directa y regresa la hebra inversa
+
+```{r}
+hebraDirec <- c("A","T","G","C","G","C","A","G","A","T","A","A")
+hebraInv <- c("","","","","","","","","","","","")
+
+invertirHebra <- function(hebraDirec, hebraInv){
+  hebraInv <- rev(hebraDirec)
+  return(hebraInv)
+}
+
+invertirHebra(hebraDirec,hebraInv)
+```
+
+## Ejercicio 7
+
+Escribe una función que recibe una hebra directa y obtiene la hebra complementaria
+
+```{r}
+
+complementario <- function(inputString) {
+  charList = strsplit(toupper(inputString), "")
+  outString = ""
+  
+  for (i in c(1:length(charList[[1]]))) {
+    currentChar = charList[[1]][i]
+    if (currentChar == "A") charList[[1]][i] = "T"
+    if (currentChar == "T") charList[[1]][i] = "A"
+    if (currentChar == "C") charList[[1]][i] = "G"
+    if (currentChar == "G") charList[[1]][i] = "C"
+    outString = paste0(outString,charList[[1]][i])
+  }
+  
+  print(outString)
+
+}
+
+inputString = readline(prompt = "Ingresa una secuencia de ADN: ")
+complementario(inputString)
+
+```
+
+## Ejercicio 8
+
+Escribe la función en R para obtener la hebra complementaria inversa, desde una hebra de ADN.
+
+```{r}
+ejemplo8 <- function(inputString) {
+  charList = strsplit(toupper(inputString), "")
+  size = length(charList[[1]])
+
+  for (i in c(1:size)) {
+    currentChar = charList[[1]][i]
+    if (currentChar == "A") charList[[1]][i] = "T"
+    if (currentChar == "T") charList[[1]][i] = "A"
+    if (currentChar == "C") charList[[1]][i] = "G"
+    if (currentChar == "G") charList[[1]][i] = "C"
+  }
+  revCharList = rev(charList[[1]])
+  outString = paste(revCharList, collapse = "")
+  print(outString)
+
+}
+
+inputString = readline(prompt = "Ingresa una secuencia de ADN: ")
+ejemplo8(inputString)
+```
+
+## Ejericicio 9
+
+Escribe una función que recibe una secuencia de RNA y regresa su equivalente en DNA (Transcripción Inversa).
+
+```{r}
+transcripcionInversa <- function(inputString) {
+  charList = strsplit(toupper(inputString), "")
+  outString = ""
+  
+  for (i in c(1:length(charList[[1]]))) {
+    currentChar = charList[[1]][i]
+    if (currentChar == "A") charList[[1]][i] = "T"
+    if (currentChar == "U") charList[[1]][i] = "A"
+    if (currentChar == "C") charList[[1]][i] = "G"
+    if (currentChar == "G") charList[[1]][i] = "C"
+    outString = paste0(outString,charList[[1]][i])
+  }
+  
+  print(outString)
+
+}
+
+inputString = readline(prompt = "Ingresa una secuencia de RNA: ")
+transcripcionInversa(inputString)
+
+
+```
